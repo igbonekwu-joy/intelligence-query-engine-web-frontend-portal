@@ -1,6 +1,6 @@
 export default function Login() {
   const handleLogin = () => {
-    window.location.href = `${process.env.REACT_APP_API_URL}/auth/github`;
+    window.location.href = `${process.env.REACT_APP_API_URL}/auth/github?client=web`;
   };
 
   return (
