@@ -6,7 +6,6 @@ import NavBar from "../components/NavBar";
 import { useAuth } from "../context/AuthContext";
 
 export default function ProfileDetail() {
-    const { user } = useAuth();
   const { id } = useParams();
   const navigate = useNavigate();
 
