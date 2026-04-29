@@ -7,6 +7,7 @@ import Dashboard from "./pages/Dashboard";
 import Profiles from "./pages/Profiles";
 import Search from "./pages/Search";
 import Account from "./pages/Account";
+import ProfileDetail from "./pages/ProfileDetail";
 
 function App() {
   return (
@@ -29,6 +30,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <Profiles />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/profile/:id"
+            element={
+              <ProtectedRoute>
+                <ProfileDetail />
               </ProtectedRoute>
             }
           />

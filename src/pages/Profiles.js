@@ -1,44 +1,115 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
+import { useAuth } from "../context/AuthContext";
+import Sidebar from "../components/Sidebar";
+import NavBar from "../components/NavBar";
+import { useNavigate } from "react-router-dom";
 
 export default function Profiles() {
+  const { user } = useAuth();
   const [profiles, setProfiles] = useState([]);
   const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const navigate = useNavigate();
 
   const fetchProfiles = async () => {
     const res = await api.get(`/api/profiles?page=${page}&limit=10`);
+    setTotalPages(res.data.total_pages);
     setProfiles(res.data.data);
   };
+  console.log(profiles)
 
   useEffect(() => {
     fetchProfiles();
   }, [page]);
 
+  function genderBadge(g) {
+    const cls = g === "male" ? "badge-male" : g === "female" ? "badge-female" : "badge-default";
+    return cls;
+  }
+
+  function probBar(val) {
+    const pct = Math.round((val || 0) * 100);
+    return pct;
+  }
+
   return (
-    <div>
-      <h2>Profiles</h2>
+    <>
+      <Sidebar />
+        <div className="main-content">
+          <NavBar />
 
-      <table border="1">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Age</th>
-            <th>Country</th>
-          </tr>
-        </thead>
-        <tbody>
-          {profiles.map((p) => (
-            <tr key={p.id}>
-              <td>{p.name}</td>
-              <td>{p.age}</td>
-              <td>{p.country_name}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+          <div className="page-body" id="page-body">
+            <h2>Profiles</h2>
 
-      <button onClick={() => setPage(page - 1)}>Prev</button>
-      <button onClick={() => setPage(page + 1)}>Next</button>
-    </div>
+            <div className="table-responsive">
+              <table className="insighta-table" border="1">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Gender</th>
+                    <th>Age</th>
+                    <th>Group</th>
+                    <th>Country</th>
+                    <th>Confidence</th>
+                    <th>Created</th>
+                    {user?.role === "admin" ? '<th></th>' : ''}
+                  </tr>
+                </thead>
+                <tbody>
+                  {profiles.map((p) => (
+                    <tr 
+                      onClick={() => navigate(`/profile/${p.id}`)} 
+                      key={p.id}
+                    >
+                      <td>
+                        <code className="id-chip">
+                          {p.id.slice(0, 8)}
+                        </code>
+                      </td>
+                      <td style={{ fontFamily:"var(--font-head)", fontWeight:"600"  }}>{p.name}</td>
+                      <td>
+                        <span className={`badge-insighta ${genderBadge(p.gender)}`}>{p.gender}</span>
+                      </td>
+                      <td style={{ color:"var(--text-muted)" }}>{p.age ?? "—"}</td>
+                      <td>
+                        <span className={`badge-insighta 'badge-default'}`}>{p.age_group}</span>
+                      </td>
+                      <td>{p.country_name || p.country_id || "—"}</td>
+                      <td>
+                        <div className="prob-bar">
+                          <div className="prob-track"><div className="prob-fill" style={{ width:`${probBar(p.gender_probability)}%` }}></div></div>
+                          <span className="prob-val">{probBar(p.gender_probability)}%</span>
+                        </div>
+                      </td>
+                      <td className="mono">
+                        {p.created_at ? new Date(p.created_at).toLocaleDateString() : "—"}
+                      </td>
+                      {user?.role === "admin" ? `<td onclick="event.stopPropagation()">
+                        <button className="btn-insighta btn-danger-i" style="padding:4px 10px;font-size:11px;" onclick="deleteProfile('${p.id}', '${p.name}')">✕</button>
+                      </td>` : ""}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <nav style={{ marginTop: "32px", display: "flex", flexDirection: "column", alignItems: "center", gap: "16px" }}>
+              <div style={{ fontSize: "13px", color: "var(--text-muted)" }}>
+                Page <span style={{ color: "var(--text)", fontWeight: "600" }}>{page}</span> of <span style={{ color: "var(--text)", fontWeight: "600" }}>{totalPages}</span>
+              </div>
+              <ul className="pagination justify-content-center" style={{ gap: "8px" }}>
+                <li className="page-item">
+                  <button className="page-link" disabled={page <= 1}  onClick={() => setPage(page - 1)} style={{ padding: "8px 16px", borderRadius: "6px" }}>← Prev</button>
+                </li>
+                <li className={`page-item ${page >= totalPages ? "disabled" : ""}`}>
+                  <button className="page-link" onClick={() => setPage(page + 1)} style={{ padding: "8px 16px", borderRadius: "6px" }}>Next →</button>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+    </>
   );
 }
