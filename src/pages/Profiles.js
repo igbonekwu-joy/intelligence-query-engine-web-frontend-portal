@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import Sidebar from "../components/Sidebar";
 import NavBar from "../components/NavBar";
 import { useNavigate } from "react-router-dom";
+import { Toaster } from "sonner";
 
 export default function Profiles() {
   const { user } = useAuth();
@@ -17,7 +18,6 @@ export default function Profiles() {
     setTotalPages(res.data.total_pages);
     setProfiles(res.data.data);
   };
-  console.log(profiles)
 
   useEffect(() => {
     fetchProfiles();
@@ -33,8 +33,20 @@ export default function Profiles() {
     return pct;
   }
 
+  const deleteProfile = async (id) => {
+    try {
+      await api.delete(`/api/profiles/${id}`);
+      fetchProfiles();
+      
+    }
+    catch(e) {
+     
+    }
+  };
+
   return (
     <>
+      <Toaster position="bottom-right" theme="dark" />
       <Sidebar />
         <div className="main-content">
           <NavBar />
@@ -54,7 +66,7 @@ export default function Profiles() {
                     <th>Country</th>
                     <th>Confidence</th>
                     <th>Created</th>
-                    {user?.role === "admin" ? '<th></th>' : ''}
+                    {user?.role === "admin" ? <th></th> : ''}
                   </tr>
                 </thead>
                 <tbody>
@@ -86,9 +98,21 @@ export default function Profiles() {
                       <td className="mono">
                         {p.created_at ? new Date(p.created_at).toLocaleDateString() : "—"}
                       </td>
-                      {user?.role === "admin" ? `<td onclick="event.stopPropagation()">
-                        <button className="btn-insighta btn-danger-i" style="padding:4px 10px;font-size:11px;" onclick="deleteProfile('${p.id}', '${p.name}')">✕</button>
-                      </td>` : ""}
+                      {user?.role === "admin" && (
+                        <td>
+                          <button 
+                            className="btn-insighta btn-danger-i" 
+                            style={{ padding: "4px 10px", fontSize: "11px" }} 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (window.confirm("Are you sure you want to delete this profile?")) 
+                                deleteProfile(p.id);
+                            }}
+                          >
+                            ✕
+                          </button>
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>

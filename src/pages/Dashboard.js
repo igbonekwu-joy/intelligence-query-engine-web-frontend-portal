@@ -1,9 +1,30 @@
+import { useState } from "react";
 import NavBar from "../components/NavBar";
 import Sidebar from "../components/Sidebar";
 import { useAuth } from "../context/AuthContext";
+import api from "../api/axios";
+import { toast } from "sonner";
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const [showModal, setShowModal] = useState(false);
+  const [profileName, setProfileName] = useState("");
+
+  const handleCreateProfile = async () => {
+    try {
+      if (profileName.trim()) {
+        console.log("Creating profile:", profileName);
+        const res = await api.post(`/api/profiles`, { name: profileName });
+        
+        setProfileName("");
+        setShowModal(false);
+
+        toast.success("Profile created successfully!");
+      }
+    } catch (error) {
+      console.error("Error creating profile:", error);
+    }
+  };
 
   return (
     <>
@@ -18,7 +39,7 @@ export default function Dashboard() {
               <div style={{ fontSize:"12px", color:"var(--text-muted)", marginBottom:"2px"  }}>Welcome back</div>
               <div style={{ fontFamily:"var(--font-head)", fontSize:"22px", fontWeight:"800"  }}>@{user?.username}</div>
             </div>
-            {user?.role === "admin" ? `<button className="btn-insighta btn-primary-i" id="create-profile-btn">＋ New Profile</button>` : ""}
+            {user?.role === "admin" && <button className="btn-insighta btn-primary-i" onClick={() => setShowModal(true)}>＋ New Profile</button>}
           </div>
 
         
@@ -64,6 +85,62 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* Create Profile Modal */}
+      {showModal && (
+        <div style={{ 
+          position: "fixed", 
+          top: 0, 
+          left: 0, 
+          right: 0, 
+          bottom: 0, 
+          backgroundColor: "rgba(0,0,0,0.5)", 
+          display: "flex", 
+          alignItems: "center", 
+          justifyContent: "center",
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: "var(--bg-1)",
+            border: "1px solid var(--border)",
+            borderRadius: "12px",
+            padding: "24px",
+            maxWidth: "400px",
+            width: "100%",
+            boxShadow: "0 20px 60px rgba(0,0,0,0.6)"
+          }}>
+            <div style={{ fontSize: "18px", fontFamily: "var(--font-head)", fontWeight: "800", marginBottom: "16px" }}>Create New Profile</div>
+            
+            <input
+              type="text"
+              placeholder="Profile Name"
+              value={profileName}
+              onChange={(e) => setProfileName(e.target.value)}
+              onKeyPress={(e) => e.key === "Enter" && handleCreateProfile()}
+              className="form-control-dark"
+              style={{ marginBottom: "20px" }}
+            />
+
+            <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+              <button
+                onClick={() => {
+                  setShowModal(false);
+                  setProfileName("");
+                }}
+                className="btn-insighta btn-ghost-i"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCreateProfile}
+                className="btn-insighta btn-primary-i"
+              >
+                Create
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
