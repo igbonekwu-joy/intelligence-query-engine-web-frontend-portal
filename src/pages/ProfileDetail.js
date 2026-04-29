@@ -84,7 +84,6 @@ export default function ProfileDetail() {
                             <span className="badge-insighta badge-default">{profile.country_name || profile.country_id || "—"}</span>
                         </div>
                     </div>
-                    {user?.role === "admin" && <button className="btn-insighta btn-danger-i">Delete Profile</button>}
                 </div>
 
                 <div className="detail-grid mb-4">
