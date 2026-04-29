@@ -5,6 +5,9 @@ const getCsrfToken = () => {
   return match ? decodeURIComponent(match[2]) : null;
 };
 
+console.log(document.cookie);
+console.log(getCsrfToken());
+
 const api = axios.create({
   baseURL: process.env.REACT_APP_API_URL,
   withCredentials: true, 
