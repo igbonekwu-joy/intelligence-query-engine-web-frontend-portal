@@ -1,14 +1,17 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import NavBar from "../components/NavBar";
 import Sidebar from "../components/Sidebar";
 import { useAuth } from "../context/AuthContext";
 import api from "../api/axios";
 import { toast } from "sonner";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
   const { user } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [profileName, setProfileName] = useState("");
+  const [total, setTotal] = useState(1);
+  const navigate = useNavigate();
 
   const handleCreateProfile = async () => {
     try {
@@ -25,6 +28,25 @@ export default function Dashboard() {
       console.error("Error creating profile:", error);
     }
   };
+
+  const fetchProfiles = async () => {
+    try{
+      const res = await api.get(`/api/profiles?&limit=50`);
+      setTotal(res.data.total);
+    }
+    catch (e) {
+      if(e.response.status === 400 || e.response.status === 401) {
+        navigate("/login");
+      }
+      else{
+        console.log(e);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchProfiles();
+  }, []);
 
   return (
     <>
@@ -44,26 +66,14 @@ export default function Dashboard() {
 
         
           <div className="row g-3 mb-4" id="stat-cards">
-            <div className="col-6 col-md-3">
+            <div className="col-6 col-md-6">
               <div className="stat-card">
                 <div className="stat-label">Total Profiles</div>
-                <div className="stat-value" id="stat-total">—</div>
+                <div className="stat-value" id="stat-total">{ total }</div>
                 <div className="stat-sub">all time</div>
               </div>
             </div>
-            <div className="col-6 col-md-3">
-              <div className="stat-card green">
-                <div className="stat-label">Male</div>
-                <div className="stat-value" id="stat-male">—</div>
-              </div>
-            </div>
-            <div className="col-6 col-md-3">
-              <div className="stat-card amber">
-                <div className="stat-label">Female</div>
-                <div className="stat-value" id="stat-female">—</div>
-              </div>
-            </div>
-            <div className="col-6 col-md-3">
+            <div className="col-6 col-md-6">
               <div className="stat-card red">
                 <div className="stat-label">Your Role</div>
                 <div className="stat-value" style={{ fontSize:"20px" }}>{user?.role}</div>
@@ -72,15 +82,10 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="card-dark">
+          <div className="card-dark" style={{ marginTop: "30px" }}>
             <div className="section-header">
-              <span className="section-title">Recent Profiles</span>
-              <a href="/pages/profiles.html" className="btn-insighta btn-ghost-i" style={{ fontSize:"12px" }}>View all →</a>
-            </div>
-            <div id="recent-table">
-              <div className="loader-wrap">
-                <div className="insighta-spinner"></div><span>Loading…</span>
-              </div>
+              <span className="section-title">All Profiles</span>
+              <Link to="profiles" className="btn-insighta btn-ghost-i" style={{ fontSize:"12px" }}>View all →</Link>
             </div>
           </div>
         </div>
