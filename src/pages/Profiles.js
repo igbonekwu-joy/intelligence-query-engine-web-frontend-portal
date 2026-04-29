@@ -41,21 +41,21 @@ export default function Profiles() {
     return params.toString();
   };
 
-  const fetchProfiles = async () => {
-    try {
-      const res = await api.get(`/api/profiles?${buildQuery(filters, page)}`);
-      setTotalPages(res.data.total_pages);
-      setProfiles(res.data.data);
-    } catch (e) {
-      if (e.response?.status === 401) {
-        navigate("/login");
-      } else {
-        console.log(e);
-      }
-    }
-  };
-
   useEffect(() => {
+    const fetchProfiles = async () => {
+      try {
+        const res = await api.get(`/api/profiles?${buildQuery(filters, page)}`);
+        setTotalPages(res.data.total_pages);
+        setProfiles(res.data.data);
+      } catch (e) {
+        if (e.response?.status === 401) {
+          navigate("/login");
+        } else {
+          console.log(e);
+        }
+      }
+    };
+
     fetchProfiles();
   }, [page, filters]);
 

@@ -47,7 +47,7 @@ export default function Dashboard() {
 
 
     fetchProfiles();
-  }, []);
+  }, [navigate]);
 
   return (
     <>
