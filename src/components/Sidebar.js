@@ -27,19 +27,6 @@ export default function Sidebar() {
                     <span className="nav-icon">○</span> My Account
                 </Link>
                 </nav>
-
-                <div className="sidebar-footer">
-                <div className="user-chip" id="user-chip">
-                    <div className="insighta-spinner" style={{ width:"24px", height:"24px", borderWidth:"1.5px", flexShrink:0  }}></div>
-                    <div className="user-info">
-                    <div className="user-name">Loading…</div>
-                    <div className="user-role">—</div>
-                    </div>
-                </div>
-                <button className="logout-btn" title="Logout" id="logout-btn" style={{ marginTop:"10px", width:"100%", textAlign:"left", padding:"6px 0", fontFamily:"var(--font-head)", fontSize:"11px", letterSpacing:"0.1em", textTransform:"uppercase", color:"var(--text-muted)"  }}>
-                    ⎋ Sign out
-                </button>
-                </div>
             </aside>
         </>
     )

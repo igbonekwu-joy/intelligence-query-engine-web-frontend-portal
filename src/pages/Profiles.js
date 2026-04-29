@@ -16,9 +16,9 @@ export default function Profiles() {
 
   const fetchProfiles = async () => {
     try{
-    const res = await api.get(`/api/profiles?page=${page}&limit=10`);
-    setTotalPages(res.data.total_pages);
-    setProfiles(res.data.data);
+      const res = await api.get(`/api/profiles?page=${page}&limit=10`);
+      setTotalPages(res.data.total_pages);
+      setProfiles(res.data.data);
     }
     catch (e) {
       if(e.response.status === 400 || e.response.status === 401) {
