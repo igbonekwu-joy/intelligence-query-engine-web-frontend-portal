@@ -12,20 +12,20 @@ export default function Sidebar() {
 
                 <nav className="sidebar-nav">
                 <div className="nav-section-label">Main</div>
-                <a href="/pages/dashboard.html" className="${activeNav === 'dashboard' ? 'active' : ''}">
+                <Link to="/pages/dashboard.html">
                     <span className="nav-icon">⬡</span> Dashboard
-                </a>
-                <Link to="/profiles" className="${activeNav === 'profiles' ? 'active' : ''}">
+                </Link>
+                <Link to="/profiles">
                     <span className="nav-icon">◈</span> Profiles
                 </Link>
-                <a href="/pages/search.html" className="${activeNav === 'search' ? 'active' : ''}">
+                <Link to="/search">
                     <span className="nav-icon">◎</span> Search
-                </a>
+                </Link>
 
                 <div className="nav-section-label" style={{ marginTop:"8px" }}>Account</div>
-                <a href="/pages/account.html" className="${activeNav === 'account' ? 'active' : ''}">
+                <Link to="/account">
                     <span className="nav-icon">○</span> My Account
-                </a>
+                </Link>
                 </nav>
 
                 <div className="sidebar-footer">

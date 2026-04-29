@@ -51,7 +51,7 @@ export default function Profiles() {
       fetchProfiles();
     }
     catch(e) {
-      if(e.response.status === 400 || e.response.status === 401) {
+      if(e.response.status === 401) {
         navigate("/login");
       }
       else{
