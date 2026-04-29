@@ -17,7 +17,7 @@ export default function Dashboard() {
     try {
       if (profileName.trim()) {
         console.log("Creating profile:", profileName);
-        const res = await api.post(`/api/profiles`, { name: profileName });
+        await api.post(`/api/profiles`, { name: profileName });
         
         setProfileName("");
         setShowModal(false);
