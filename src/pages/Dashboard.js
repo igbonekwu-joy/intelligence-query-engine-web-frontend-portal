@@ -35,7 +35,7 @@ export default function Dashboard() {
       setTotal(res.data.total);
     }
     catch (e) {
-      if(e.response.status === 400 || e.response.status === 401) {
+      if(e.response.status === 400 || e.response.status === 401 || e.response.status === 403) {
         navigate("/login");
       }
       else{
