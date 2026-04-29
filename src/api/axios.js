@@ -2,10 +2,10 @@ import axios from "axios";
 
 const getCsrfToken = () => {
   const match = document.cookie.match(/(^|;)\s*csrf_token=([^;]+)/);
+  console.log(document.cookie);
   return match ? decodeURIComponent(match[2]) : null;
 };
 
-console.log(document.cookie);
 console.log(getCsrfToken());
 
 const api = axios.create({
