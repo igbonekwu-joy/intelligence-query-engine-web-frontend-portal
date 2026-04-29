@@ -4,7 +4,8 @@ import { useAuth } from "../context/AuthContext";
 import Sidebar from "../components/Sidebar";
 import NavBar from "../components/NavBar";
 import { useNavigate } from "react-router-dom";
-import { Toaster } from "sonner";
+import { Toaster, toast } from "sonner";
+import { UserPlus } from "lucide-react";
 
 export default function Profiles() {
   const { user } = useAuth();
@@ -14,9 +15,19 @@ export default function Profiles() {
   const navigate = useNavigate();
 
   const fetchProfiles = async () => {
+    try{
     const res = await api.get(`/api/profiles?page=${page}&limit=10`);
     setTotalPages(res.data.total_pages);
     setProfiles(res.data.data);
+    }
+    catch (e) {
+      if(e.response.status === 400 || e.response.status === 401) {
+        navigate("/login");
+      }
+      else{
+        console.log(e);
+      }
+    }
   };
 
   useEffect(() => {
@@ -36,11 +47,16 @@ export default function Profiles() {
   const deleteProfile = async (id) => {
     try {
       await api.delete(`/api/profiles/${id}`);
+      toast.success("Profile deleted successfully!");
       fetchProfiles();
-      
     }
     catch(e) {
-     
+      if(e.response.status === 400 || e.response.status === 401) {
+        navigate("/login");
+      }
+      else{
+        toast.error(e.response?.data?.message || "Failed to delete profile");
+      }
     }
   };
 
@@ -100,17 +116,19 @@ export default function Profiles() {
                       </td>
                       {user?.role === "admin" && (
                         <td>
-                          <button 
-                            className="btn-insighta btn-danger-i" 
-                            style={{ padding: "4px 10px", fontSize: "11px" }} 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (window.confirm("Are you sure you want to delete this profile?")) 
-                                deleteProfile(p.id);
-                            }}
-                          >
-                            ✕
-                          </button>
+                          <div style={{ display: "flex", gap: "6px" }}>
+                            <button 
+                              className="btn-insighta btn-danger-i" 
+                              style={{ padding: "6px 10px", fontSize: "12px" }} 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (window.confirm("Are you sure you want to delete this profile?")) 
+                                  deleteProfile(p.id);
+                              }}
+                            >
+                              ✕
+                            </button>
+                          </div>
                         </td>
                       )}
                     </tr>
