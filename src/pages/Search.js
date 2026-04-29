@@ -10,35 +10,41 @@ export default function Search() {
   const { user } = useAuth();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [searched, setSearched] = useState(false);
   const navigate = useNavigate();
 
-  const handleSearch = async () => {
+  const handleSearch = async (p = 1) => {
     try {
-      const res = await api.get(`/api/profiles/search?q=${query}`);
+      const res = await api.get(`/api/profiles/search?q=${query}&page=${p}&limit=10`);
       setResults(res.data.data);
-    }
-    catch (e) {
-      if(e.response.status === 401) {
+      setTotalPages(res.data.total_pages);
+      setPage(p);
+      setSearched(true);
+    } catch (e) {
+      if (e.response?.status === 401) {
         navigate("/login");
-      }
-      else{
+      } else {
         console.log(e);
       }
     }
+  };
+
+  const handlePageChange = (newPage) => {
+    handleSearch(newPage);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const deleteProfile = async (id) => {
     try {
       await api.delete(`/api/profiles/${id}`);
       toast.success("Profile deleted successfully!");
-
-
-    }
-    catch(e) {
-      if(e.response.status === 401) {
+      handleSearch(page); // refresh current page after delete
+    } catch (e) {
+      if (e.response?.status === 401) {
         navigate("/login");
-      }
-      else{
+      } else {
         toast.error(e.response?.data?.message || "Failed to delete profile");
       }
     }
@@ -54,52 +60,58 @@ export default function Search() {
         <NavBar />
 
         <div className="page-body" id="page-body">
-          <div style={{ marginBottom:"20px" }}>
-              <a href="/pages/profiles.html" className="btn-insighta btn-ghost-i" style={{ fontSize:"12px" }}>← Profiles</a>
+          <div style={{ marginBottom: "20px" }}>
+            <a href="/profiles" className="btn-insighta btn-ghost-i" style={{ fontSize: "12px" }}>← Profiles</a>
           </div>
           <h2>Search</h2>
-    
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            type="text"
-            placeholder="Search text"
-            className="form-control-dark"
-            style={{ marginBottom: "20px" }}
-          />
-          <button onClick={handleSearch} className="btn-insighta btn-ghost-i">Search</button>
+
+          <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch(1)}
+              type="text"
+              placeholder="e.g. young males from Nigeria"
+              className="form-control-dark"
+              style={{ flex: 1 }}
+            />
+            <button onClick={() => handleSearch(1)} className="btn-insighta btn-ghost-i">Search</button>
+          </div>
+
+          {searched && results.length === 0 && (
+            <div style={{ textAlign: "center", color: "var(--text-muted)", padding: "48px 0" }}>
+              No results found for "{query}".
+            </div>
+          )}
 
           {results.map((p) => (
-            <>
+            <div key={p.id}>
               <div className="profile-avatar-wrap mb-4 mt-4" style={{ marginTop: "10px" }}>
                 <div style={{ flex: 1 }} className="mt-5">
-                  <div style={{ fontFamily:"var(--font-head)",fontSize:'"',fontWeight:"800" }}>{p.name || "—"}</div>
-                  <div style={{ display:"flex",gap:"8px",marginTop:"8px",flexWrap:"wrap "}}>
+                  <div style={{ fontFamily: "var(--font-head)", fontWeight: "800" }}>{p.name || "—"}</div>
+                  <div style={{ display: "flex", gap: "8px", marginTop: "8px", flexWrap: "wrap" }}>
                     {p.gender} {p.age_group}
                     <span className="badge-insighta badge-default">{p.country_name || p.country_id || "—"}</span>
                   </div>
                 </div>
-                {isAdmin 
-                ? 
-                  <button 
-                    className="btn-insighta btn-danger-i" 
-                    id="delete-btn"
+                {isAdmin && (
+                  <button
+                    className="btn-insighta btn-danger-i"
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (window.confirm("Are you sure you want to delete this profile?")) 
+                      if (window.confirm("Are you sure you want to delete this profile?"))
                         deleteProfile(p.id);
                     }}
                   >
                     Delete Profile
-                  </button> 
-                : 
-                ""}
+                  </button>
+                )}
               </div>
 
               <div className="detail-grid mb-4">
                 <div className="detail-item">
                   <div className="detail-key">Profile ID</div>
-                  <div style={{ marginTop:"4px" }}><code className="id-chip" style={{ fontSize:"12px" }}>{p.id}</code></div>
+                  <div style={{ marginTop: "4px" }}><code className="id-chip" style={{ fontSize: "12px" }}>{p.id}</code></div>
                 </div>
                 <div className="detail-item">
                   <div className="detail-key">Full Name</div>
@@ -107,7 +119,7 @@ export default function Search() {
                 </div>
                 <div className="detail-item">
                   <div className="detail-key">Gender</div>
-                  <div className="detail-val" style={{ marginTop:"6px" }}>{p.gender}</div>
+                  <div className="detail-val" style={{ marginTop: "6px" }}>{p.gender}</div>
                 </div>
                 <div className="detail-item">
                   <div className="detail-key">Gender Confidence</div>
@@ -120,7 +132,7 @@ export default function Search() {
                 </div>
                 <div className="detail-item">
                   <div className="detail-key">Age Group</div>
-                  <div style={{ marginTop:"6px" }}>{p.age_group}</div>
+                  <div style={{ marginTop: "6px" }}>{p.age_group}</div>
                 </div>
                 <div className="detail-item">
                   <div className="detail-key">Country</div>
@@ -129,15 +141,48 @@ export default function Search() {
                 </div>
                 <div className="detail-item">
                   <div className="detail-key">Country Confidence</div>
-                  <div style={{ marginTop:"8px" }}>{p.country_probability}</div>
+                  <div style={{ marginTop: "8px" }}>{p.country_probability}</div>
                 </div>
                 <div className="detail-item">
                   <div className="detail-key">Created At</div>
-                  <div className="detail-val" style={{ fontSize:"14px" }}>{p.created_at ? new Date(p.created_at).toLocaleString() : "—"}</div>
+                  <div className="detail-val" style={{ fontSize: "14px" }}>{p.created_at ? new Date(p.created_at).toLocaleString() : "—"}</div>
                 </div>
               </div>
-            </>
+            </div>
           ))}
+
+          {/* Pagination */}
+          {searched && totalPages > 1 && (
+            <nav style={{ marginTop: "32px", display: "flex", flexDirection: "column", alignItems: "center", gap: "16px" }}>
+              <div style={{ fontSize: "13px", color: "var(--text-muted)" }}>
+                Page <span style={{ color: "var(--text)", fontWeight: "600" }}>{page}</span> of{" "}
+                <span style={{ color: "var(--text)", fontWeight: "600" }}>{totalPages}</span>
+              </div>
+              <ul className="pagination justify-content-center" style={{ gap: "8px" }}>
+                <li className="page-item">
+                  <button
+                    className="page-link"
+                    disabled={page <= 1}
+                    onClick={() => handlePageChange(page - 1)}
+                    style={{ padding: "8px 16px", borderRadius: "6px" }}
+                  >
+                    ← Prev
+                  </button>
+                </li>
+                <li className={`page-item ${page >= totalPages ? "disabled" : ""}`}>
+                  <button
+                    className="page-link"
+                    disabled={page >= totalPages}
+                    onClick={() => handlePageChange(page + 1)}
+                    style={{ padding: "8px 16px", borderRadius: "6px" }}
+                  >
+                    Next →
+                  </button>
+                </li>
+              </ul>
+            </nav>
+          )}
+
         </div>
       </div>
     </div>
