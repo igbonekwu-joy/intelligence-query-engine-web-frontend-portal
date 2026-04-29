@@ -12,7 +12,7 @@ export default function Sidebar() {
 
                 <nav className="sidebar-nav">
                 <div className="nav-section-label">Main</div>
-                <Link to="/pages/dashboard.html">
+                <Link to="/">
                     <span className="nav-icon">⬡</span> Dashboard
                 </Link>
                 <Link to="/profiles">
