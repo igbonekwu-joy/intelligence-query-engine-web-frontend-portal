@@ -17,10 +17,16 @@ api.interceptors.response.use((response) => response, async (error) => {
   if (error.response.status === 401 && !originalRequest._retry) {
     originalRequest._retry = true;
     try {
-      await api.post("/auth/refresh");
-      //api.defaults.headers.common["Authorization"] = `Bearer ${res.data.data}`;
+      await axios.post(
+          `${process.env.REACT_APP_API_URL}/auth/refresh`,
+          { headers: 
+              { 'X-API-Version': 1 }
+          }
+      );
+
       return api(originalRequest);
     } catch (err) {
+      window.location.href = "/login";
       return Promise.reject(err);
     }
   }
