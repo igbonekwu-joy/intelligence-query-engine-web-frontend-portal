@@ -17,7 +17,7 @@ export default function Dashboard() {
     try {
       if (profileName.trim()) {
         console.log("Creating profile:", profileName);
-        const res = await api.post(`/api/profiles`, { name: profileName });
+        await api.post(`/api/profiles`, { name: profileName });
         
         setProfileName("");
         setShowModal(false);
@@ -29,24 +29,25 @@ export default function Dashboard() {
     }
   };
 
-  const fetchProfiles = async () => {
-    try{
-      const res = await api.get(`/api/profiles?&limit=50`);
-      setTotal(res.data.total);
-    }
-    catch (e) {
-      if(e.response.status === 400 || e.response.status === 401 || e.response.status === 403) {
-        navigate("/login");
-      }
-      else{
-        console.log(e);
-      }
-    }
-  };
-
   useEffect(() => {
+    const fetchProfiles = async () => {
+      try{
+        const res = await api.get(`/api/profiles?&limit=50`);
+        setTotal(res.data.total);
+      }
+      catch (e) {
+        if(e.response.status === 400 || e.response.status === 401 || e.response.status === 403) {
+          navigate("/login");
+        }
+        else{
+          console.log(e);
+        }
+      }
+    };
+
+
     fetchProfiles();
-  }, []);
+  }, [navigate]);
 
   return (
     <>

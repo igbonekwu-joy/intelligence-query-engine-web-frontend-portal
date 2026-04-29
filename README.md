@@ -130,4 +130,4 @@ fix(profiles): handle empty search results
 ## Related Repositories
 
 - 🔧 [Backend](https://github.com/igbonekwu-joy/intelligence-query-engine)
-- 💻 [CLI](https://github.com/igbonekwu-joy/intelligence-query-engine-web-frontend-portal)
+- 💻 [CLI](https://github.com/igbonekwu-joy/intelligence-query-engine-cli)

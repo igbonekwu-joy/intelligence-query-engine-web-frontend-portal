@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import api from "../api/axios";
 import { useAuth } from "../context/AuthContext";
 import Sidebar from "../components/Sidebar";
@@ -41,7 +41,7 @@ export default function Profiles() {
     return params.toString();
   };
 
-  const fetchProfiles = async () => {
+  const fetchProfiles = useCallback(async () => {
     try {
       const res = await api.get(`/api/profiles?${buildQuery(filters, page)}`);
       setTotalPages(res.data.total_pages);
@@ -53,11 +53,11 @@ export default function Profiles() {
         console.log(e);
       }
     }
-  };
+  }, [filters, page, navigate]);
 
   useEffect(() => {
     fetchProfiles();
-  }, [page, filters]);
+  }, [fetchProfiles]);
 
   const handleApplyFilters = () => {
     setPage(1); // reset to page 1 on new filter

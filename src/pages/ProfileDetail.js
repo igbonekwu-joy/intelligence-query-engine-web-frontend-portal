@@ -3,10 +3,8 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import api from "../api/axios";
 import Sidebar from "../components/Sidebar";
 import NavBar from "../components/NavBar";
-import { useAuth } from "../context/AuthContext";
 
 export default function ProfileDetail() {
-    const { user } = useAuth();
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -14,18 +12,6 @@ export default function ProfileDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [display, setDisplay] = useState(false);
-
-  const fetchProfile = async () => {
-    try {
-      setLoading(true);
-      const res = await api.get(`/api/profiles/${id}`);
-      setProfile(res.data.data);
-    } catch (err) {
-      setError("Failed to load profile");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const genderBadge = (g) => {
     const cls = g === "male" ? "badge-male" : g === "female" ? "badge-female" : "badge-default";
@@ -40,6 +26,18 @@ export default function ProfileDetail() {
   const initials = (profile?.name || "?").split(" ").map(w => w[0]).join("").slice(0,2).toUpperCase();
 
   useEffect(() => {
+    const fetchProfile = async () => {
+        try {
+        setLoading(true);
+        const res = await api.get(`/api/profiles/${id}`);
+        setProfile(res.data.data);
+        } catch (err) {
+        setError("Failed to load profile");
+        } finally {
+        setLoading(false);
+        }
+    };
+    
     fetchProfile();
   }, [id]);
 
