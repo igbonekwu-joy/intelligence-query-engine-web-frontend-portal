@@ -25,10 +25,16 @@ api.interceptors.response.use(
     ) {
       originalRequest._retry = true;
       try {
-        await axios.post(
-          `${process.env.REACT_APP_API_URL}/auth/refresh`,
+        // await axios.post(
+        //   `${process.env.REACT_APP_API_URL}/auth/refresh`,
+        //   {},
+        //   { headers: { 'X-API-Version': 1 } } // ← also fixed: headers go as 3rd arg
+        // );
+
+        await api.post(
+          '/auth/refresh',
           {},
-          { headers: { 'X-API-Version': 1 } } // ← also fixed: headers go as 3rd arg
+          { headers: { 'X-API-Version': 1 } }
         );
         return api(originalRequest);
       } catch (err) {
