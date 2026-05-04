@@ -3,7 +3,7 @@ import NavBar from "../components/NavBar";
 import Sidebar from "../components/Sidebar";
 import { useAuth } from "../context/AuthContext";
 import api from "../api/axios";
-import { toast } from "sonner";
+import { toast, Toaster } from "sonner";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
@@ -51,6 +51,7 @@ export default function Dashboard() {
 
   return (
     <>
+     <Toaster position="bottom-right" theme="dark" />
       <Sidebar />
 
       <div className="main-content">
